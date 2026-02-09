@@ -9,7 +9,6 @@
     (function() {
       'use strict';
       var search = window.location.search;
-      console.log('[index.html] Page load, URL:', window.location.href);
 
       // Check if this is an OAuth callback (has ?code= in URL)
       if (search && search.indexOf('code=') !== -1) {
@@ -18,34 +17,18 @@
         var state = params.get('state');
         var error = params.get('error');
 
-        console.log('[index.html] OAuth callback detected!');
-        console.log('[index.html] code length:', code ? code.length : 0);
-        console.log('[index.html] state:', state ? 'present' : 'null');
-
         if (code) {
           sessionStorage.setItem('oauth_code', code);
           sessionStorage.setItem('oauth_state', state || '');
-          console.log('[index.html] Saved oauth_code to sessionStorage, length:', code.length);
 
           // Clean URL immediately to prevent service worker caching issues
           // The code is now safely in sessionStorage
           window.history.replaceState({}, document.title, '/');
-          console.log('[index.html] Cleaned URL to /');
         }
         if (error) {
           sessionStorage.setItem('oauth_error', error);
-          console.log('[index.html] Saved oauth_error to sessionStorage:', error);
         }
-      } else {
-        console.log('[index.html] Not an OAuth callback');
       }
-
-      // Debug: show what's in sessionStorage
-      console.log('[index.html] sessionStorage contents:');
-      console.log('  oauth_code:', sessionStorage.getItem('oauth_code') ? 'present (' + sessionStorage.getItem('oauth_code').length + ' chars)' : 'null');
-      console.log('  oauth_state:', sessionStorage.getItem('oauth_state') || 'null');
-      console.log('  pkce_code_verifier:', sessionStorage.getItem('pkce_code_verifier') ? 'present (' + sessionStorage.getItem('pkce_code_verifier').length + ' chars)' : 'null');
-      console.log('  pkce_state:', sessionStorage.getItem('pkce_state') || 'null');
     })();
   </script>
 
