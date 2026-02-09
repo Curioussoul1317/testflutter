@@ -1,29 +1,28 @@
- <IfModule mod_rewrite.c>                                                                                                                                           
+  <IfModule mod_rewrite.c>
       RewriteEngine On
 
       # Handle Authorization Header
       RewriteCond %{HTTP:Authorization} .
       RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-      # Let Laravel handle these routes (don't redirect to Flutter)
-      RewriteRule ^payonline(.*)$ - [L]
-      RewriteRule ^api(.*)$ - [L]
-      RewriteRule ^logout(.*)$ - [L]
-      RewriteRule ^efaas(.*)$ - [L]
-      RewriteRule ^payment-info(.*)$ - [L]
-      RewriteRule ^bills/receipt(.*)$ - [L]
+      # Route Laravel API/routes to index.php (Laravel entry point)
+      RewriteRule ^payonline(.*)$ index.php [L]
+      RewriteRule ^api(.*)$ index.php [L]
+      RewriteRule ^logout(.*)$ index.php [L]
+      RewriteRule ^efaas(.*)$ index.php [L]
+      RewriteRule ^payment-info(.*)$ index.php [L]
+      RewriteRule ^bills/receipt(.*)$ index.php [L]
 
       # If the request is for an existing file or directory, serve it directly
       RewriteCond %{REQUEST_FILENAME} -f [OR]
       RewriteCond %{REQUEST_FILENAME} -d
       RewriteRule ^ - [L]
 
-      # Otherwise, serve index.html and preserve query string (QSA flag)
-      # The QSA flag is CRITICAL for OAuth callbacks with ?code=XXX
+      # Otherwise, serve index.html (Flutter SPA) and preserve query string
       RewriteRule ^ index.html [L,QSA]
   </IfModule>
 
-  # Enable CORS for API requests (if needed)
+  # Enable CORS for API requests
   <IfModule mod_headers.c>
       Header set Access-Control-Allow-Origin "*"
       Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
