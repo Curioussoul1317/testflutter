@@ -2,6 +2,54 @@
 <html>
 <head>
   <!--
+    CRITICAL: This script MUST be FIRST - before base href, before anything else.
+    It saves OAuth callback params before the service worker can strip them.
+  -->
+  <script>
+    (function() {
+      'use strict';
+      var search = window.location.search;
+      console.log('[index.html] Page load, URL:', window.location.href);
+
+      // Check if this is an OAuth callback (has ?code= in URL)
+      if (search && search.indexOf('code=') !== -1) {
+        var params = new URLSearchParams(search);
+        var code = params.get('code');
+        var state = params.get('state');
+        var error = params.get('error');
+
+        console.log('[index.html] OAuth callback detected!');
+        console.log('[index.html] code length:', code ? code.length : 0);
+        console.log('[index.html] state:', state ? 'present' : 'null');
+
+        if (code) {
+          sessionStorage.setItem('oauth_code', code);
+          sessionStorage.setItem('oauth_state', state || '');
+          console.log('[index.html] Saved oauth_code to sessionStorage, length:', code.length);
+
+          // Clean URL immediately to prevent service worker caching issues
+          // The code is now safely in sessionStorage
+          window.history.replaceState({}, document.title, '/');
+          console.log('[index.html] Cleaned URL to /');
+        }
+        if (error) {
+          sessionStorage.setItem('oauth_error', error);
+          console.log('[index.html] Saved oauth_error to sessionStorage:', error);
+        }
+      } else {
+        console.log('[index.html] Not an OAuth callback');
+      }
+
+      // Debug: show what's in sessionStorage
+      console.log('[index.html] sessionStorage contents:');
+      console.log('  oauth_code:', sessionStorage.getItem('oauth_code') ? 'present (' + sessionStorage.getItem('oauth_code').length + ' chars)' : 'null');
+      console.log('  oauth_state:', sessionStorage.getItem('oauth_state') || 'null');
+      console.log('  pkce_code_verifier:', sessionStorage.getItem('pkce_code_verifier') ? 'present (' + sessionStorage.getItem('pkce_code_verifier').length + ' chars)' : 'null');
+      console.log('  pkce_state:', sessionStorage.getItem('pkce_state') || 'null');
+    })();
+  </script>
+
+  <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
 
@@ -31,34 +79,6 @@
 
   <title>WAMCO Online</title>
   <link rel="manifest" href="manifest.json">
-
-  <!--
-    CRITICAL: Save OAuth callback params BEFORE Flutter/service worker loads.
-    The service worker or Flutter's URL handling may strip query params.
-    We save them to sessionStorage so Flutter can read them later.
-  -->
-  <script>
-    (function() {
-      'use strict';
-      var params = new URLSearchParams(window.location.search);
-      var code = params.get('code');
-      var state = params.get('state');
-      var error = params.get('error');
-
-      console.log('[index.html] URL on page load:', window.location.href);
-      console.log('[index.html] Query params - code:', code ? 'present' : 'null', 'state:', state ? 'present' : 'null');
-
-      if (code) {
-        sessionStorage.setItem('oauth_code', code);
-        sessionStorage.setItem('oauth_state', state || '');
-        console.log('[index.html] Saved OAuth code and state to sessionStorage');
-      }
-      if (error) {
-        sessionStorage.setItem('oauth_error', error);
-        console.log('[index.html] Saved OAuth error to sessionStorage:', error);
-      }
-    })();
-  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
