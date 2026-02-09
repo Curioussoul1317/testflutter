@@ -127453,7 +127453,7 @@ o.U(new A.aTF(o))
 q=3
 l=$.cF().$1$0(t.Q)
 s=6
-return A.l(J.agK(l,"/api/payonline/bills/"+A.k(n)+"/"+A.k(m),t.z),$async$EG)
+return A.l(J.agK(l,"/payonline/bills/"+A.k(n)+"/"+A.k(m),t.z),$async$EG)
 case 6:k=b
 j=t.P.a(k.a)
 if(J.c(J.a7(j,"success"),!0)){h=t.nA.a(J.a7(j,"bill"))
