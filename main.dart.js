@@ -118078,7 +118078,7 @@ o=n==null?null:n.b[1]}else o=null
 if(o==null){p.c.ab(t.J).f.e9(B.a7t)
 s=1
 break}m=$.cx().$1$0(t.Q).d
-l="https://online.wamco.mv/forms/"+o
+l="https://online.wamco.mv/api/forms/"+o
 k=A.e2(m!=null&&m.length!==0?l+"?session="+m:l,0,null)
 s=5
 return A.i(A.aZ9(k),$async$uK)
